@@ -23,25 +23,57 @@ export class AianalysisService {
   async getArticleById(articleId: number) {
     const client = this.supabaseService.getClient();
 
-    const { data, error } = await client
-    .from('articles')
-    .select(`
-      *,
-      sources (
-        id,
-        name,
-        url,
-        weight
-      )
-    `)
-    .eq('id', articleId)
-    .single();
+    // Get article data with sources
+    const { data: articleData, error: articleError } = await client
+      .from('articles')
+      .select(`
+        *,
+        sources (
+          id,
+          name,
+          url,
+          weight
+        )
+      `)
+      .eq('id', articleId)
+      .single();
 
-    if (error) {
-      throw new Error(`Failed to fetch article: ${error.message}`);
+    if (articleError) {
+      throw new Error(`Failed to fetch article: ${articleError.message}`);
     }
 
-    return data;
+    // Get sentiment analysis data
+    const { data: sentimentData, error: sentimentError } = await client
+      .from('article_polarity')
+      .select('*')
+      .eq('article_id', articleId)
+      .single();
+
+    // Get event classification data
+    const { data: eventData, error: eventError } = await client
+      .from('article_events')
+      .select('*')
+      .eq('article_id', articleId)
+      .single();
+
+    // Get trading strategy data
+    const { data: strategyData, error: strategyError } = await client
+      .from('article_strategy_signals')
+      .select('*')
+      .eq('article_id', articleId)
+      .single();
+
+    // Combine all data (only include analysis data if it exists)
+    const result = {
+      ...articleData,
+      analysis: {
+        sentiment: sentimentError ? null : sentimentData,
+        events: eventError ? null : eventData,
+        strategy: strategyError ? null : strategyData,
+      },
+    };
+
+    return result;
   }
 
   async saveSentimentAnalysis(articleId: number, analysis: any) {
