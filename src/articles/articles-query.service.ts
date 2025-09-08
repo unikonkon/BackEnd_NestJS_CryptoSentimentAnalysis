@@ -190,8 +190,8 @@ export class ArticlesQueryService {
       .single();
 
     if (error) {
-      this.logger.error(`Failed to fetch article ${id}: ${error.message}`);
-      throw new Error(`Failed to fetch article: ${error.message}`);
+      this.logger.error(`Failed to fetch getArticleById ${id}: ${error.message}`);
+      throw new Error(`Failed to fetch getArticleById: ${error.message}`);
     }
 
     return {
@@ -260,8 +260,8 @@ export class ArticlesQueryService {
       .limit(limit);
 
     if (error) {
-      this.logger.error(`Failed to fetch recent articles: ${error.message}`);
-      throw new Error(`Failed to fetch recent articles: ${error.message}`);
+      this.logger.error(`Failed to fetch getRecentArticles: ${error.message}`);
+      throw new Error(`Failed to fetch getRecentArticles: ${error.message}`);
     }
 
     return {

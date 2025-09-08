@@ -52,10 +52,12 @@ export class ArticlesController {
     return await this.articlesQueryService.getArticlesStats(startDate, endDate);
   }
 
-  // Get article by ID from Supabase
-  @Get('supabase/:id')
-  async getArticleById(@Param('id') id: string) {
-    return await this.articlesQueryService.getArticleById(+id);
+  // Get recent articles (must come before :id route)
+  @Get('supabase/recent')
+  async getRecentArticles(@Query('limit') limit?: string) {
+    return await this.articlesQueryService.getRecentArticles(
+      limit ? parseInt(limit) : 10,
+    );
   }
 
   // Get articles by source name
@@ -72,11 +74,9 @@ export class ArticlesController {
     );
   }
 
-  // Get recent articles
-  @Get('supabase/recent')
-  async getRecentArticles(@Query('limit') limit?: string) {
-    return await this.articlesQueryService.getRecentArticles(
-      limit ? parseInt(limit) : 10,
-    );
+  // Get article by ID from Supabase (must come after specific routes)
+  @Get('supabase/:id')
+  async getArticleById(@Param('id') id: string) {
+    return await this.articlesQueryService.getArticleById(+id);
   }
 }
